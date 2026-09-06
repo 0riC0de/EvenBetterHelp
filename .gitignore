@@ -1,0 +1,29 @@
+# Dependencies and build outputs
+node_modules/
+**/node_modules/
+.next/
+**/.next/
+out/
+build/
+**/build/
+.gradle/
+**/.gradle/
+.pnpm-store/
+**/.pnpm-store/
+
+# Environment and secrets
+.env
+.env.local
+*.env
+!.env.example
+
+# Cache, logs, and temp
+.cache/
+**/.cache/
+*.log
+*.class
+*.tsbuildinfo
+pairing.jpg
+.DS_Store
+Thumbs.db
+

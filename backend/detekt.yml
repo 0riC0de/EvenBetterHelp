@@ -1,0 +1,5 @@
+complexity:
+  active: true
+  CognitiveComplexMethod:
+    active: true
+    threshold: 7

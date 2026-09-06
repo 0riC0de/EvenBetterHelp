@@ -1,0 +1,49 @@
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: ${DATABASE_USER:?Set DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:?Set DATABASE_PASSWORD}
+      POSTGRES_DB: helpdesk
+    volumes: ["postgres-data:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d helpdesk"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+  backend:
+    build: ./backend
+    env_file: .env
+    environment:
+      DATABASE_URL: jdbc:postgresql://db:5432/helpdesk
+    depends_on:
+      db: { condition: service_healthy }
+    restart: unless-stopped
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args: { NEXT_PUBLIC_DEMO_MODE: "false" }
+    environment:
+      BACKEND_URL: http://backend:8080
+      COOKIE_SECURE: ${COOKIE_SECURE:-true}
+    depends_on: [backend]
+  gateway:
+    profiles: [whatsapp]
+    build: ./gateway
+    env_file: .env
+    environment:
+      DATABASE_URL: jdbc:postgresql://db:5432/helpdesk
+      BACKEND_CALLBACK_URL: http://backend:8080/bridge/events
+      COBALT_SESSION_DIR: /session
+    volumes: ["cobalt-session:/session"]
+    depends_on: [backend]
+    restart: unless-stopped
+  proxy:
+    image: nginx:1.28-alpine
+    ports: ["127.0.0.1:8088:80"]
+    volumes: ["./ops/nginx.conf:/etc/nginx/conf.d/default.conf:ro"]
+    depends_on: [frontend]
+volumes:
+  postgres-data:
+  cobalt-session:

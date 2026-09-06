@@ -1,0 +1,5 @@
+{
+  "name": "even-better-help", "private": true,
+  "scripts": {"dev": "pnpm --dir frontend dev", "build": "pnpm --dir frontend build", "check": "pnpm --dir frontend check", "test": "pnpm --dir frontend test"},
+  "packageManager": "pnpm@11.19.0"
+}
